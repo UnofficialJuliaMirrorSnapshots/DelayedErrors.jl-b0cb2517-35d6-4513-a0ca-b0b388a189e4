@@ -1,7 +1,7 @@
 name = "DelayedErrors"
 uuid = "b0cb2517-35d6-4513-a0ca-b0b388a189e4"
 authors = ["Dilum Aluthge <dilum@aluthge.com>"]
-version = "0.2.0"
+version = "0.3.0"
 
 [compat]
 julia = "^1.0.0"

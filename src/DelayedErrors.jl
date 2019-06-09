@@ -3,11 +3,30 @@ module DelayedErrors
 export push_delayed_error, pop_delayed_errors
 
 struct DelayedError
-    message::S where S <: AbstractString
-    dict::T where T <: AbstractDict
+    message::T1 where T1 <: AbstractString
+    dict::T2 where T2 <: AbstractDict
+    bt::T3 where T3
+    st::T4 where T4
 end
 
-function __init__()::Nothing
+@noinline function DelayedError(
+        message::T1,
+        dict::T2,
+        )::DelayedError where
+        T1 <: AbstractString where
+        T2 <: AbstractDict
+    bt = backtrace()
+    st = stacktrace(bt)
+    x = DelayedError(
+        message,
+        dict,
+        bt,
+        st,
+        )
+    return x
+end
+
+@noinline function __init__()::Nothing
     global delayed_error_list = Vector{DelayedError}()
     return nothing
 end
@@ -20,18 +39,21 @@ function push_delayed_error end
 """
 function pop_delayed_errors end
 
-function push_delayed_error(
+@noinline function push_delayed_error(
         message::S;
         kwargs...
         )::Nothing where S <: AbstractString
     x = DelayedError(message, Dict(kwargs...),)
     global delayed_error_list
     push!(delayed_error_list, x,)
-    @error("Delaying this error until later: $(x.message)", x.dict...)
+    @error("Pushed delayed error: $(x.message)", x.dict...)
+    Base.show_backtrace(stderr, x.bt,)
+    println(stderr)
+    println(stderr)
     return nothing
 end
 
-function push_delayed_error(
+@noinline function push_delayed_error(
         message::Vararg{Any,N};
         kwargs...
         )::Nothing where {N}
@@ -39,14 +61,17 @@ function push_delayed_error(
     return nothing
 end
 
-function pop_delayed_errors()::Nothing
+@noinline function pop_delayed_errors()::Nothing
     global delayed_error_list
     if isempty(delayed_error_list)
-        @debug("There were no delayed errors.")
+        @debug("There were no delayed errors to pop.")
     else
         while !isempty(delayed_error_list)
             x = popfirst!(delayed_error_list)
-            @error("Delayed error from earlier: $(x.message)", x.dict...)
+            @error("Popped delayed error: $(x.message)", x.dict...)
+            Base.show_backtrace(stderr, x.bt,)
+            println(stderr)
+            println(stderr)
         end
         error("There were one or more delayed errors.")
     end
