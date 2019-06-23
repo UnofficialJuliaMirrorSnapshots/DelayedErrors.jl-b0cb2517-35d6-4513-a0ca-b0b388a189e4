@@ -2,7 +2,6 @@
 
 branches:
     only:
-    - develop
     - master
     - staging
     - trying
@@ -13,7 +12,6 @@ git:
     depth: 99999999
 
 julia:
-    - "1.0"
     - "1.1"
 
 language: julia
