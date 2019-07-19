@@ -2,7 +2,7 @@
 
 <p>
 <a
-href="https://app.bors.tech/repositories/11625">
+href="https://app.bors.tech/repositories/12701">
 <img
 src="https://bors.tech/images/badge_small.svg"
 alt="Bors enabled">
